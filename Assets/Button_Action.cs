@@ -111,9 +111,10 @@ public class Button_Action : MonoBehaviour
             previspressed = ispressed;
             if (PowerObject != null)
             {
+                int a = ispressed ? 1 : -1;
                 foreach (GameObject g in PowerObject)
                 {
-                    g.GetComponent<PowerBlock_Action>().ispowered = ispressed;
+                    g.GetComponent<PowerBlock_Action>().powered += a;
                 }
             }
         }

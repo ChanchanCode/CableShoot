@@ -5,7 +5,7 @@ using UnityEngine;
 public class OpenedBlock_Action : MonoBehaviour
 {
     PowerBlock_Action PA;
-    bool ispowered;
+    int powered;
     public Sprite[] LBS;
     SpriteRenderer sr;
     BoxCollider2D bc;
@@ -20,11 +20,11 @@ public class OpenedBlock_Action : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ispowered = PA.ispowered;
+        powered = PA.powered;
 
-        sr.color = ispowered ? Main_Action.PowerCol : Color.white;
-        sr.sprite = ispowered ? LBS[1] : LBS[0];
-        bc.enabled = ispowered;
+        sr.color = powered > 0 ? Main_Action.PowerCol : Color.white;
+        sr.sprite = powered > 0 ? LBS[1] : LBS[0];
+        bc.enabled = (powered > 0);
         
     }
 }

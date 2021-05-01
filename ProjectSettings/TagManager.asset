@@ -7,6 +7,8 @@ TagManager:
   - Socket
   - Box
   - Plug
+  - BorderLine
+  - Danger
   layers:
   - Default
   - TransparentFX
@@ -19,8 +21,8 @@ TagManager:
   - Ground
   - Plug
   - Player
-  - 
-  - 
+  - Border
+  - Danger
   - 
   - 
   - 

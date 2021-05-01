@@ -5,6 +5,18 @@ using UnityEngine;
 public class Main_Action : MonoBehaviour
 {
     public static Color PowerCol;
+    public static int stage = 0;
+    public static float borderx = -0.5f;
+    public static float bordery = 0f;
+    public Transform[] RestartTransform;
+
+    public AudioClip Aud_Pluggedin;
+    public AudioClip Aud_Walk;
+    public AudioClip Aud_Jump;
+    public AudioClip Aud_Die;
+    public AudioClip Aud_Shoot;
+    public AudioClip Aud_NotPluggedin;
+
     // Start is called before the first frame update
     void Start()
     {

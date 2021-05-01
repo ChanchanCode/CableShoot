@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PowerBlock_Action : MonoBehaviour
 {
-    public bool ispowered;
+    public int powered;
     // Start is called before the first frame update
     void Start()
     {

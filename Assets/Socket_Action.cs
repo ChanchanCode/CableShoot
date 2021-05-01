@@ -23,9 +23,10 @@ public class Socket_Action : MonoBehaviour
             previspowered = ispowered;
             if (PowerObject != null)
             {
+                int a = ispowered ? 1 : -1;
                 foreach (GameObject g in PowerObject)
                 {
-                    g.GetComponent<PowerBlock_Action>().ispowered = ispowered;
+                    g.GetComponent<PowerBlock_Action>().powered += a;
                 }
             }
         }
