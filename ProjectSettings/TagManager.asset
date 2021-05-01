@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Socket
   - Box
+  - Plug
   layers:
   - Default
   - TransparentFX
@@ -16,7 +17,7 @@ TagManager:
   - 
   - 
   - Ground
-  - 
+  - Plug
   - 
   - 
   - 
@@ -42,4 +43,7 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Player
+    uniqueID: 3666139897
     locked: 0

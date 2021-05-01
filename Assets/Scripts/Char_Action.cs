@@ -6,18 +6,22 @@ public class Char_Action : MonoBehaviour
 {
     float xInput;
     float yInput;
-    public float hangcounter;
+    public float hangcount;
     public float hangtime;
     public float jumpbuffercount;
     public float jumpbuffertime;
     public float shoottime;
+    public float picktime;
+
     public float charspeed;
     public float jumpspeed;
     public float shootspeed;
+    public float throwforce;
     public float gravityscale;
     bool jumpcanceled = false;
     public LayerMask groundlayer;
     public LayerMask pluglayer;
+    public LayerMask pickedupboxlayer;
     public bool isgrounded = true;
     public Transform groundCheckPoint1;
     public Transform groundCheckPoint2;
@@ -29,6 +33,7 @@ public class Char_Action : MonoBehaviour
     public int shootdir = 1;
     public int state;
     public bool isboxpicked;
+    public GameObject PickedBox;
 
 
     Rigidbody2D rb;
@@ -66,26 +71,32 @@ public class Char_Action : MonoBehaviour
         {
             jumpbuffercount -= Time.deltaTime;
         }
-        if (Input.GetKeyDown(KeyCode.X) && shoottime > 0.07f)
+        if (Input.GetKeyDown(KeyCode.X) && shoottime > 0.5f)
         {
             Shoot();
         }
+
+        if (Input.GetKeyDown(KeyCode.Z) && picktime > 0.07f)
+        {
+            Pick();
+        }
+
         isgrounded = Physics2D.OverlapCircle(groundCheckPoint1.position, 0.015f, groundlayer) || Physics2D.OverlapCircle(groundCheckPoint2.position, 0.015f, groundlayer) || Physics2D.OverlapCircle(groundCheckPoint3.position, 0.015f, groundlayer);
 
 
         if (isgrounded)
         {
-            hangcounter = hangtime;
+            hangcount = hangtime;
             jumpcanceled = false;
             anim.SetBool("isjumping", false);
         }
         else
         {
-            hangcounter -= Time.deltaTime;
+            hangcount -= Time.deltaTime;
         }
 
 
-        if (jumpbuffercount > 0f && hangcounter > 0f)
+        if (jumpbuffercount > 0f && hangcount > 0f)
         {
             Jump();
         }
@@ -152,6 +163,7 @@ public class Char_Action : MonoBehaviour
         }
 
         shoottime += Time.deltaTime;
+        picktime += Time.deltaTime;
 
         if (state == 1 || state == 2 || state == 3)
         {
@@ -166,22 +178,23 @@ public class Char_Action : MonoBehaviour
                 lr.SetPosition(0, new Vector3(CharPlugLinePos.position.x, PlugLinePos.position.y, 0f));
                 lr.SetPosition(1, new Vector3(PlugLinePos.position.x, PlugLinePos.position.y, 0f));
             }
-
-        }
+        }   // 선 그리기
         else
         {
             lr.enabled = false;
         }
-        if (state == 3)
+
+
+        if (state == 3) //이동
         {
-            rb.velocity = new Vector2(0f, Input.GetAxisRaw("Vertical") * charspeed);
+            rb.velocity = new Vector2(0f, Input.GetAxisRaw("Vertical") * charspeed * (isboxpicked ? 0.6f : 1) * (state == 2 || state == 3 ? 2 : 1));
         }
         else
         {
-            rb.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * charspeed * (state == 1 ? 0 : 1), rb.velocity.y);
+            rb.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * charspeed * (state == 1 ? 0 : 1) * (isboxpicked ? 0.6f : 1) * (state == 2 || state == 3 ? 2 : 1), rb.velocity.y);
         }
 
-        if (!Plug.GetComponent<Rigidbody2D>().freezeRotation && Vector3.Distance(CharPlugLinePos.position, Plug.transform.position) < 0.5f)
+        if (!Plug.GetComponent<Rigidbody2D>().freezeRotation && Vector3.Distance(CharPlugLinePos.position, Plug.transform.position) < 0.5f) //플러그 밟아 없애기
         {
             if(Physics2D.OverlapCircle(groundCheckPoint1.position, 0.02f, pluglayer) || Physics2D.OverlapCircle(groundCheckPoint2.position, 0.02f, pluglayer) || Physics2D.OverlapCircle(groundCheckPoint3.position, 0.02f, pluglayer))
             {
@@ -189,13 +202,19 @@ public class Char_Action : MonoBehaviour
             }
         }
 
+        if (isboxpicked)
+        {
+            PickedBox.transform.position = new Vector2(CharPlugLinePos.position.x + 0.2f * shootdir, CharPlugLinePos.position.y + 0.2f);
+        }
+
         anim.SetFloat("xspeed", Mathf.Abs(rb.velocity.x));
         anim.SetFloat("yspeed", rb.velocity.y);
+        anim.SetBool("ispluggedandground", (state == 2 || state == 3) && !isgrounded ? true : false);
     }
     void Jump()
     {
-        rb.velocity = new Vector2(rb.velocity.x, jumpspeed);
-        hangcounter = 0;
+        rb.velocity = new Vector2(rb.velocity.x, jumpspeed * (isboxpicked ? 0.6f : 1));
+        hangcount = 0;
         jumpbuffercount = 0;
         anim.SetBool("isjumping", true);
     }
@@ -248,6 +267,39 @@ public class Char_Action : MonoBehaviour
             }
         }
     }
+    void Pick()
+    {
+        picktime = 0;
+        if (!isboxpicked)
+        {
+            Collider2D[] col = Physics2D.OverlapCircleAll(new Vector2(CharPlugLinePos.position.x + 0.123f * shootdir, CharPlugLinePos.position.y), 0.1f, groundlayer);
+            foreach (Collider2D c in col)
+            {
+                if (c.gameObject.CompareTag("Box"))
+                {
+                    isboxpicked = true;
+                    PickedBox = c.gameObject;
+                    PickedBox.transform.SetParent(transform);
+                    PickedBox.GetComponent<BoxCollider2D>().enabled = false;
+                    PickedBox.GetComponent<Rigidbody2D>().gravityScale = 0;
+                    PickedBox.GetComponent<SpriteRenderer>().sortingOrder = 4;
+                    PickedBox.layer = 10;
+                }
+            }
+        }
+        else if (!Physics2D.OverlapCircle(new Vector2(CharPlugLinePos.position.x + 0.3f * shootdir, CharPlugLinePos.position.y + 0.3f), 0.20f, groundlayer))
+        {
+            isboxpicked = false;
+            PickedBox.transform.position = new Vector2(CharPlugLinePos.position.x + 0.3f * shootdir, CharPlugLinePos.position.y + 0.2f);
+            PickedBox.transform.SetParent(null);
+            PickedBox.GetComponent<Rigidbody2D>().gravityScale = gravityscale;
+            PickedBox.GetComponent<Rigidbody2D>().AddForce(new Vector2(shootdir*3f, 1f) * throwforce, ForceMode2D.Impulse);
+            PickedBox.layer = 8;
+            Invoke("TurnOnPickedUpBoxCollider", 0.07f);
+            PickedBox.GetComponent<SpriteRenderer>().sortingOrder = 3;
+        }
+        
+    }
     void PlugFail()
     {
         Plug.GetComponent<Rigidbody2D>().gravityScale = gravityscale;
@@ -271,5 +323,10 @@ public class Char_Action : MonoBehaviour
         Plug.GetComponent<Rigidbody2D>().mass = 3f;
         Plug.GetComponent<Rigidbody2D>().gravityScale = 0;
         Plug.GetComponent<Rigidbody2D>().freezeRotation = true;
+    }
+    void TurnOnPickedUpBoxCollider()
+    {
+        PickedBox.GetComponent<BoxCollider2D>().enabled = true;
+        PickedBox = null;
     }
 }
