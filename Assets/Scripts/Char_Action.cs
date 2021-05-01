@@ -22,7 +22,6 @@ public class Char_Action : MonoBehaviour
     bool jumpcanceled = false;
     public LayerMask groundlayer;
     public LayerMask pluglayer;
-    public Color PowerCol;
     public bool isgrounded = true;
     public Transform groundCheckPoint1;
     public Transform groundCheckPoint2;
@@ -30,12 +29,18 @@ public class Char_Action : MonoBehaviour
     public Transform CharPlugLinePos;
     public Transform PlugLinePos;
     public Transform PlugColCheckPos;
+    public Transform BorderPos;
     public GameObject Plug;
+    public GameObject BorderTile;
+    public GameObject BorderTileBack;
     public int shootdir = 1;
     public int state;
     public bool isboxpicked;
     public GameObject PickedBox;
-
+    public GameObject PoweredObject;
+    public GameObject PluggedSocket;
+    
+    public string Entereddir;
 
     Rigidbody2D rb;
     Animator anim;
@@ -44,10 +49,14 @@ public class Char_Action : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Entereddir = "left";
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         sr = GetComponent<SpriteRenderer>();
         lr = GetComponent<LineRenderer>();
+        PoweredObject = null;
+        PickedBox = null;
+        PluggedSocket = null;
     }
 
     // Update is called once per frame조작법
@@ -99,7 +108,18 @@ public class Char_Action : MonoBehaviour
 
         if (jumpbuffercount > 0f && hangcount > 0f)
         {
-            Jump();
+            if (state == 2 || state == 3)
+            {
+                PlugFail();
+                rb.gravityScale = gravityscale;
+                state = 0;
+                jumpcanceled = false;
+                Jump();
+            }
+            else
+            {
+                Jump();
+            }
         }
         if (!Input.GetKey(KeyCode.C) && rb.velocity.y > 0 && !jumpcanceled)
         {
@@ -129,6 +149,10 @@ public class Char_Action : MonoBehaviour
                     if (c.gameObject.CompareTag("Socket"))
                     {
                         CameraShaker.Instance.ShakeOnce(4f, 4f, 0.1f, 0.1f);
+                        PoweredObject = c.gameObject;
+                        PowerOn();
+                        PluggedSocket = c.gameObject;
+                        c.gameObject.GetComponent<Socket_Action>().ispowered = true;
                         if (Plug.transform.rotation == Quaternion.Euler(0f, 0f, 90f))
                         {
                             state = 3;
@@ -161,7 +185,26 @@ public class Char_Action : MonoBehaviour
                 rb.gravityScale = gravityscale;
                 state = 0;
             }
-
+            if (Plug.transform.rotation == Quaternion.Euler(0f, 0f, 90f))
+            {
+                if (Mathf.Abs(transform.position.x - PlugLinePos.position.x) > 0.05f)
+                {
+                    Plug.SetActive(false);
+                    PlugFail();
+                    rb.gravityScale = gravityscale;
+                    state = 0;
+                }
+            }
+            else
+            {
+                if (Mathf.Abs(transform.position.y - PlugLinePos.position.y) > 0.1f)
+                {
+                    Plug.SetActive(false);
+                    PlugFail();
+                    rb.gravityScale = gravityscale;
+                    state = 0;
+                }
+            }
         }
 
         shoottime += Time.deltaTime;
@@ -196,11 +239,29 @@ public class Char_Action : MonoBehaviour
             rb.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * charspeed * (state == 1 ? 0 : 1) * (isboxpicked ? 0.6f : 1) * (state == 2 || state == 3 ? 2 : 1), rb.velocity.y);
         }
 
-        if (!Plug.GetComponent<Rigidbody2D>().freezeRotation && Vector3.Distance(CharPlugLinePos.position, Plug.transform.position) < 0.5f) //플러그 밟아 없애기
+
+        if (!Plug.GetComponent<Rigidbody2D>().freezeRotation)
         {
-            if(Physics2D.OverlapCircle(groundCheckPoint1.position, 0.02f, pluglayer) || Physics2D.OverlapCircle(groundCheckPoint2.position, 0.02f, pluglayer) || Physics2D.OverlapCircle(groundCheckPoint3.position, 0.02f, pluglayer))
+            if (Vector3.Distance(CharPlugLinePos.position, Plug.transform.position) < 0.5f)
             {
-                Plug.SetActive(false);
+                if (Physics2D.OverlapCircle(groundCheckPoint1.position, 0.02f, pluglayer) || Physics2D.OverlapCircle(groundCheckPoint2.position, 0.02f, pluglayer) || Physics2D.OverlapCircle(groundCheckPoint3.position, 0.02f, pluglayer))
+                {
+                    Plug.SetActive(false);
+                }
+            }
+            else
+            {
+                Collider2D[] col = Physics2D.OverlapCircleAll(Plug.transform.position, 0.121f, groundlayer);
+                foreach (Collider2D c in col)
+                {
+                    if (c.gameObject.CompareTag("Box"))
+                    {
+                        if (c.transform.position.y > Plug.transform.position.y + 0.25f)
+                        {
+                            Plug.SetActive(false);
+                        }
+                    }
+                }
             }
         }
 
@@ -307,6 +368,7 @@ public class Char_Action : MonoBehaviour
     }
     void PlugFail()
     {
+        PowerOff();
         Plug.GetComponent<Rigidbody2D>().gravityScale = gravityscale;
         Plug.GetComponent<Rigidbody2D>().freezeRotation = false;
         Plug.GetComponent<Rigidbody2D>().mass = 0.5f;
@@ -333,5 +395,38 @@ public class Char_Action : MonoBehaviour
     {
         PickedBox.GetComponent<BoxCollider2D>().enabled = true;
         PickedBox = null;
+    }
+    void PowerOn()
+    {
+        if (PoweredObject != null)
+        {
+            PoweredObject.GetComponent<SpriteRenderer>().color = Main_Action.PowerCol;
+            lr.startColor = Main_Action.PowerCol;
+            lr.endColor = Main_Action.PowerCol;
+            Plug.GetComponent<SpriteRenderer>().color = Main_Action.PowerCol;
+        }
+    }
+    void PowerOff()
+    {
+        if (PoweredObject != null)
+        {
+            PoweredObject.GetComponent<SpriteRenderer>().color = Color.white;
+            lr.startColor = Color.white;
+            lr.endColor = Color.white;
+            Plug.GetComponent<SpriteRenderer>().color = Color.white;
+            PoweredObject = null;
+            if (PluggedSocket != null)
+            {
+                PluggedSocket.GetComponent<Socket_Action>().ispowered = false;
+                PluggedSocket = null;
+            }
+        }
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("BorderLine"))
+        {
+
+        }
     }
 }
