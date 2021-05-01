@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using EZCameraShake;
 
 public class Char_Action : MonoBehaviour
 {
@@ -21,7 +22,7 @@ public class Char_Action : MonoBehaviour
     bool jumpcanceled = false;
     public LayerMask groundlayer;
     public LayerMask pluglayer;
-    public LayerMask pickedupboxlayer;
+    public Color PowerCol;
     public bool isgrounded = true;
     public Transform groundCheckPoint1;
     public Transform groundCheckPoint2;
@@ -71,12 +72,12 @@ public class Char_Action : MonoBehaviour
         {
             jumpbuffercount -= Time.deltaTime;
         }
-        if (Input.GetKeyDown(KeyCode.X) && shoottime > 0.5f)
+        if (Input.GetKeyDown(KeyCode.X) && shoottime > 0.07f)
         {
             Shoot();
         }
 
-        if (Input.GetKeyDown(KeyCode.Z) && picktime > 0.07f)
+        if (Input.GetKeyDown(KeyCode.Z) && picktime > 0.15f)
         {
             Pick();
         }
@@ -127,6 +128,7 @@ public class Char_Action : MonoBehaviour
                 {
                     if (c.gameObject.CompareTag("Socket"))
                     {
+                        CameraShaker.Instance.ShakeOnce(4f, 4f, 0.1f, 0.1f);
                         if (Plug.transform.rotation == Quaternion.Euler(0f, 0f, 90f))
                         {
                             state = 3;
@@ -153,7 +155,7 @@ public class Char_Action : MonoBehaviour
                 }
                 
             }
-            else if (shoottime > 1f)
+            else if (shoottime > 0.5f)
             {
                 PlugFail();
                 rb.gravityScale = gravityscale;
@@ -213,6 +215,7 @@ public class Char_Action : MonoBehaviour
     }
     void Jump()
     {
+        shoottime = 0;
         rb.velocity = new Vector2(rb.velocity.x, jumpspeed * (isboxpicked ? 0.6f : 1));
         hangcount = 0;
         jumpbuffercount = 0;
@@ -230,6 +233,7 @@ public class Char_Action : MonoBehaviour
                     PlugReset();
                     state = 1;
                     rb.gravityScale = 0;
+                    rb.velocity = Vector2.zero;
                     Plug.transform.position = new Vector2(CharPlugLinePos.position.x, CharPlugLinePos.position.y + 0.6f);
                     Plug.GetComponent<Rigidbody2D>().velocity = new Vector2(0f, shootspeed);
                     Plug.transform.localScale = new Vector3(1, 1, 1);
@@ -253,6 +257,7 @@ public class Char_Action : MonoBehaviour
                     PlugReset();
                     state = 1;
                     rb.gravityScale = 0;
+                    rb.velocity = Vector2.zero;
                     Plug.transform.position = new Vector2(CharPlugLinePos.position.x + 0.123f * shootdir, CharPlugLinePos.position.y);
                     Plug.GetComponent<Rigidbody2D>().velocity = new Vector2(shootspeed * shootdir, 0f);
                     Plug.transform.localScale = new Vector3(shootdir, 1, 1);
@@ -287,7 +292,7 @@ public class Char_Action : MonoBehaviour
                 }
             }
         }
-        else if (!Physics2D.OverlapCircle(new Vector2(CharPlugLinePos.position.x + 0.3f * shootdir, CharPlugLinePos.position.y + 0.3f), 0.20f, groundlayer))
+        else if (!Physics2D.OverlapCircle(new Vector2(CharPlugLinePos.position.x + 0.4f * shootdir, CharPlugLinePos.position.y + 0.2f), 0.15f, groundlayer))
         {
             isboxpicked = false;
             PickedBox.transform.position = new Vector2(CharPlugLinePos.position.x + 0.3f * shootdir, CharPlugLinePos.position.y + 0.2f);
