@@ -10,7 +10,8 @@ public class Char_Action : MonoBehaviour
     public Main_Action main;
 
     public bool debugmode;
-
+    public int debugstage;
+    public string debugdir;
     float xInput;
     float yInput;
     public float hangcount;
@@ -53,7 +54,7 @@ public class Char_Action : MonoBehaviour
     public bool issticked;
     GameObject Moveblock;
 
-    public string Entereddir;
+    
 
     Rigidbody2D rb;
     Animator anim;
@@ -87,6 +88,10 @@ public class Char_Action : MonoBehaviour
         {
             Main_Action.borderx = BorderTile.transform.position.x;
             Main_Action.bordery = BorderTile.transform.position.y;
+            Main_Action.stage = debugstage;
+            Main_Action.Entereddir = debugdir;
+            main.StageSetting();
+            main.SettingUpdate();
         }
         GetComponent<BoxCollider2D>().enabled = true;
         RestartCurtainEnd();
@@ -289,10 +294,10 @@ public class Char_Action : MonoBehaviour
         {
             if (Vector3.Distance(CharPlugLinePos.position, Plug.transform.position) < 0.5f)
             {
-                //if (Physics2D.OverlapCircle(groundCheckPoint1.position, 0.03f, pluglayer) || Physics2D.OverlapCircle(groundCheckPoint2.position, 0.03f, pluglayer) || Physics2D.OverlapCircle(groundCheckPoint3.position, 0.03f, pluglayer))
-                //{
-                    //Plug.SetActive(false);
-                //}
+                if (Physics2D.OverlapCircle(groundCheckPoint1.position, 0.03f, pluglayer) || Physics2D.OverlapCircle(groundCheckPoint2.position, 0.03f, pluglayer) || Physics2D.OverlapCircle(groundCheckPoint3.position, 0.03f, pluglayer))
+                {
+                    Plug.SetActive(false);
+                }
             }
             else
             {
@@ -444,6 +449,7 @@ public class Char_Action : MonoBehaviour
                     PickedBox.GetComponent<SpriteRenderer>().sortingOrder = 4;
                     PickedBox.layer = 10;
                     rb.velocity = new Vector2(rb.velocity.x, Mathf.Min(jumpspeed * (isboxpicked ? 0.6f : 1), rb.velocity.y));
+                    break;
                 }
             }
         }
@@ -522,47 +528,47 @@ public class Char_Action : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("BorderLine") && !isroommove)
         {
-            if (transform.position.x > BorderTile.transform.position.x + 5.8f && Entereddir != "right")
+            if (transform.position.x > BorderTile.transform.position.x + 5.8f && Main_Action.Entereddir != "right")
             {
                 Main_Action.borderx += 12.5f;
                 PlugFail();
                 state = 0;
                 Plug.SetActive(false);
                 isroommove = true;
-                Entereddir = "left";
+                Main_Action.Entereddir = "left";
                 Main_Action.stage += 1;
                 main.StageSetting();
             }
-            else if (transform.position.x < BorderTile.transform.position.x - 5.83f && Entereddir != "left")
+            else if (transform.position.x < BorderTile.transform.position.x - 5.83f && Main_Action.Entereddir != "left")
             {
                 Main_Action.borderx -= 12.5f;
                 PlugFail();
                 state = 0;
                 Plug.SetActive(false);
                 isroommove = true;
-                Entereddir = "right";
+                Main_Action.Entereddir = "right";
                 Main_Action.stage += 1;
                 main.StageSetting();
             }
-            else if (transform.position.y > BorderTile.transform.position.y + 3.38f && Entereddir != "up")
+            else if (transform.position.y > BorderTile.transform.position.y + 3.38f && Main_Action.Entereddir != "up")
             {
                 Main_Action.bordery += 7.5f;
                 PlugFail();
                 state = 0;
                 Plug.SetActive(false);
                 isroommove = true;
-                Entereddir = "down";
+                Main_Action.Entereddir = "down";
                 Main_Action.stage += 1;
                 main.StageSetting();
             }
-            else if (transform.position.y < BorderTile.transform.position.y - 3.38f && Entereddir != "down")
+            else if (transform.position.y < BorderTile.transform.position.y - 3.38f && Main_Action.Entereddir != "down")
             {
                 Main_Action.bordery -= 7.5f;
                 PlugFail();
                 state = 0;
                 Plug.SetActive(false);
                 isroommove = true;
-                Entereddir = "up";
+                Main_Action.Entereddir = "up";
                 Main_Action.stage += 1;
                 main.StageSetting();
             }

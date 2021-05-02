@@ -13,6 +13,7 @@ public class Main_Action : MonoBehaviour
     public static float second = 0;
     public static int minute = 0;
     public static int hour = 0;
+    public static string Entereddir = "left";
 
     public GameObject RestartPositionManager;
     public List<GameObject> RestartPosition;
@@ -55,6 +56,18 @@ public class Main_Action : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        SettingUpdate();
+    }
+    public void StageSetting()
+    {
+        StageText.text = "Stage " + stage.ToString();
+        if (StageInfoText.text != stageinfostring[Mathf.Clamp(stage, 1, RestartPositionManagerChildnum) - 1])
+        {
+            StageInfoText.text = stageinfostring[Mathf.Clamp(stage, 1, RestartPositionManagerChildnum) - 1];
+        }
+    }
+    public void SettingUpdate()
+    {
         second += Time.deltaTime;
         if (second >= 60)
         {
@@ -83,14 +96,6 @@ public class Main_Action : MonoBehaviour
                 TimerText.text = hour.ToString() + ":" + (minute.ToString().Length == 1 ? "0" + minute.ToString() : minute.ToString()) + ":" + secondtext;
             }
             prevsecondtext = secondtext;
-        }
-    }
-    public void StageSetting()
-    {
-        StageText.text = "Stage " + stage.ToString();
-        if (StageInfoText.text != stageinfostring[Mathf.Clamp(stage, 1, RestartPositionManagerChildnum) - 1])
-        {
-            StageInfoText.text = stageinfostring[Mathf.Clamp(stage, 1, RestartPositionManagerChildnum) - 1];
         }
     }
 }
