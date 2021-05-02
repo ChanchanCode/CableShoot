@@ -47,6 +47,8 @@ public class Char_Action : MonoBehaviour
     public Image CoverPanel;
     public int coverpanelstate;
     public bool isroommove;
+    public bool issticked;
+    GameObject Moveblock;
 
     public string Entereddir;
 
@@ -70,6 +72,8 @@ public class Char_Action : MonoBehaviour
         sr.enabled = true;
         BorderTileBack.SetActive(true);
         isroommove = false;
+        issticked = false;
+        Moveblock = null;
         state = 0;
         transform.position = main.RestartTransform[Main_Action.stage].position;
         BorderTile.transform.position = new Vector3(Main_Action.borderx, Main_Action.bordery, 0f);
@@ -173,7 +177,7 @@ public class Char_Action : MonoBehaviour
                         PowerOn();
                         PluggedSocket = c.gameObject;
                         c.gameObject.GetComponent<Socket_Action>().ispowered = true;
-                        aud.PlayOneShot(main.Aud_Pluggedin, 0.3f);
+                        aud.PlayOneShot(main.Aud_Pluggedin, 0.6f);
                         if (Plug.transform.rotation == Quaternion.Euler(0f, 0f, 90f))
                         {
                             state = 3;
@@ -189,7 +193,7 @@ public class Char_Action : MonoBehaviour
                     {
                         PlugFail();
                         state = 0;
-                        aud.PlayOneShot(main.Aud_NotPluggedin, 0.1f);
+                        aud.PlayOneShot(main.Aud_NotPluggedin, 0.2f);
                         break;
                     }
                 }
@@ -198,7 +202,7 @@ public class Char_Action : MonoBehaviour
                     PlugFail();
                     rb.gravityScale = gravityscale;
                     state = 0;
-                    aud.PlayOneShot(main.Aud_NotPluggedin, 0.1f);
+                    aud.PlayOneShot(main.Aud_NotPluggedin, 0.2f);
                 }
                 
             }
@@ -262,7 +266,8 @@ public class Char_Action : MonoBehaviour
         }
         else if (state != -1)
         {
-            rb.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * charspeed * (state == 1 ? 0 : 1) * (isboxpicked ? 0.6f : 1) * (state == 2 || state == 3 ? 2 : 1), rb.velocity.y);
+            rb.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * charspeed * (state == 1 ? 0 : 1) * (isboxpicked ? 0.6f : 1) * (state == 2 || state == 3 ? 2 : 1)
+                + (Moveblock != null && issticked ? Moveblock.GetComponent<Rigidbody2D>().velocity.x : 0), rb.velocity.y);
         }
 
 
@@ -328,7 +333,7 @@ public class Char_Action : MonoBehaviour
             }
         }
 
-        if (Mathf.Abs(rb.velocity.x) > 0 && isgrounded)
+        if (Mathf.Abs(rb.velocity.x) - (Moveblock != null && issticked ? Moveblock.GetComponent<Rigidbody2D>().velocity.x : 0) > 1f && isgrounded)
         {
             walktime += Time.deltaTime;
         }
@@ -339,15 +344,15 @@ public class Char_Action : MonoBehaviour
         if (walktime >= 0.4f)
         {
             walktime = 0f;
-            aud.PlayOneShot(main.Aud_Walk, 0.05f);
+            aud.PlayOneShot(main.Aud_Walk, 0.2f);
         }
-        anim.SetFloat("xspeed", Mathf.Abs(rb.velocity.x));
-        anim.SetFloat("yspeed", rb.velocity.y);
+        anim.SetFloat("xspeed", Mathf.Abs(rb.velocity.x) - (Moveblock != null && issticked ? Moveblock.GetComponent<Rigidbody2D>().velocity.x : 0));
+        anim.SetFloat("yspeed", rb.velocity.y - (Moveblock != null && issticked ? Moveblock.GetComponent<Rigidbody2D>().velocity.y : 0));
         anim.SetBool("ispluggedandground", (state == 2 || state == 3) && !isgrounded ? true : false);
     }
     void Jump()
     {
-        aud.PlayOneShot(main.Aud_Jump, 0.1f);
+        aud.PlayOneShot(main.Aud_Jump, 0.2f);
         shoottime = 0;
         rb.velocity = new Vector2(rb.velocity.x, jumpspeed * (isboxpicked ? 0.6f : 1));
         hangcount = 0;
@@ -371,7 +376,7 @@ public class Char_Action : MonoBehaviour
                     Plug.GetComponent<Rigidbody2D>().velocity = new Vector2(0f, shootspeed);
                     Plug.transform.localScale = new Vector3(1, 1, 1);
                     Plug.transform.rotation = Quaternion.Euler(0f, 0f, 90f);
-                    aud.PlayOneShot(main.Aud_Shoot, 0.3f);
+                    aud.PlayOneShot(main.Aud_Shoot, 0.6f);
                 }
             }
             else if (state == 2 || state == 3)
@@ -396,7 +401,7 @@ public class Char_Action : MonoBehaviour
                     Plug.GetComponent<Rigidbody2D>().velocity = new Vector2(shootspeed * shootdir, 0f);
                     Plug.transform.localScale = new Vector3(shootdir, 1, 1);
                     Plug.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-                    aud.PlayOneShot(main.Aud_Shoot, 0.3f);
+                    aud.PlayOneShot(main.Aud_Shoot, 0.6f);
                 }
             }
             else if (state == 2 || state == 3)
@@ -547,7 +552,7 @@ public class Char_Action : MonoBehaviour
         }
         if (collision.gameObject.CompareTag("Danger") && state != -1)
         {
-            aud.PlayOneShot(main.Aud_Die, 0.15f);
+            aud.PlayOneShot(main.Aud_Die, 0.3f);
             CameraShaker.Instance.ShakeOnce(6f, 7f, 0.1f, 0.3f);
             CircleParticle.Play();
             state = -1;
@@ -567,6 +572,19 @@ public class Char_Action : MonoBehaviour
                 PickedBox.GetComponent<SpriteRenderer>().sortingOrder = 3;
             }
             Invoke("RestartCurtainStart", 0.6f);
+        }
+        if (collision.gameObject.CompareTag("MovingBlock") && isgrounded)
+        {
+            issticked = true;
+            Moveblock = collision.gameObject;
+        }
+    }
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("MovingBlock") && collision.gameObject == Moveblock)
+        {
+            issticked = false;
+            Moveblock = null;
         }
     }
     void Restart()

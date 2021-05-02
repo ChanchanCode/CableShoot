@@ -47,6 +47,10 @@ public class Button_Action : MonoBehaviour
                         box = c.gameObject;
                     ispressed = true;
                 }
+                else if(c.gameObject.CompareTag("MovingBlock"))
+                {
+                    ispressed = true;
+                }
             }
             col = Physics2D.OverlapCircleAll(ButtonCheckPos2.position, 0.0763f, groundlayer);
             foreach (Collider2D c in col)
@@ -57,6 +61,10 @@ public class Button_Action : MonoBehaviour
                         box = c.gameObject;
                     ispressed = true;
                 }
+                else if (c.gameObject.CompareTag("MovingBlock"))
+                {
+                    ispressed = true;
+                }
             }
             col = Physics2D.OverlapCircleAll(ButtonCheckPos3.position, 0.0763f, groundlayer);
             foreach (Collider2D c in col)
@@ -65,6 +73,10 @@ public class Button_Action : MonoBehaviour
                 {
                     if (box != c.gameObject)
                         box = c.gameObject;
+                    ispressed = true;
+                }
+                else if (c.gameObject.CompareTag("MovingBlock"))
+                {
                     ispressed = true;
                 }
             }

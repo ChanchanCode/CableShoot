@@ -9,6 +9,7 @@ TagManager:
   - Plug
   - BorderLine
   - Danger
+  - MovingBlock
   layers:
   - Default
   - TransparentFX
