@@ -75,7 +75,7 @@ public class Char_Action : MonoBehaviour
         issticked = false;
         Moveblock = null;
         state = 0;
-        transform.position = main.RestartTransform[Main_Action.stage].position;
+        transform.position = main.RestartPosition[Mathf.Clamp(Main_Action.stage, 1, main.RestartPositionManagerChildnum) - 1].transform.position;
         BorderTile.transform.position = new Vector3(Main_Action.borderx, Main_Action.bordery, 0f);
         GetComponent<BoxCollider2D>().enabled = true;
         RestartCurtainEnd();
@@ -517,6 +517,7 @@ public class Char_Action : MonoBehaviour
                 isroommove = true;
                 Entereddir = "left";
                 Main_Action.stage += 1;
+                main.StageSetting();
             }
             else if (transform.position.x < BorderTile.transform.position.x - 5.83f && Entereddir != "left")
             {
@@ -527,6 +528,7 @@ public class Char_Action : MonoBehaviour
                 isroommove = true;
                 Entereddir = "right";
                 Main_Action.stage += 1;
+                main.StageSetting();
             }
             else if (transform.position.y > BorderTile.transform.position.y + 3.38f && Entereddir != "up")
             {
@@ -537,6 +539,7 @@ public class Char_Action : MonoBehaviour
                 isroommove = true;
                 Entereddir = "down";
                 Main_Action.stage += 1;
+                main.StageSetting();
             }
             else if (transform.position.y < BorderTile.transform.position.y - 3.38f && Entereddir != "down")
             {
@@ -547,8 +550,8 @@ public class Char_Action : MonoBehaviour
                 isroommove = true;
                 Entereddir = "up";
                 Main_Action.stage += 1;
+                main.StageSetting();
             }
-            
         }
         if (collision.gameObject.CompareTag("Danger") && state != -1)
         {
@@ -589,6 +592,7 @@ public class Char_Action : MonoBehaviour
     }
     void Restart()
     {
+        Main_Action.attempts += 1;
         PlugFail();
         Plug.SetActive(false);
         isroommove = false;
