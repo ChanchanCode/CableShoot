@@ -7,12 +7,12 @@ public class Main_Action : MonoBehaviour
 {
     public static Color PowerCol;
     public static int stage = 1;
-    public static float borderx = -0.5f;
+    public static float borderx = -63f;
     public static float bordery = 0f;
     public static int attempts = 0;
-    float second = 0;
-    int minute = 0;
-    int hour = 0;
+    public static float second = 0;
+    public static int minute = 0;
+    public static int hour = 0;
 
     public GameObject RestartPositionManager;
     public List<GameObject> RestartPosition;

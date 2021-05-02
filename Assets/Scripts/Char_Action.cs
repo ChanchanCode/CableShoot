@@ -8,6 +8,9 @@ using UnityEngine.UI;
 public class Char_Action : MonoBehaviour
 {
     public Main_Action main;
+
+    public bool debugmode;
+
     float xInput;
     float yInput;
     public float hangcount;
@@ -75,8 +78,16 @@ public class Char_Action : MonoBehaviour
         issticked = false;
         Moveblock = null;
         state = 0;
-        transform.position = main.RestartPosition[Mathf.Clamp(Main_Action.stage, 1, main.RestartPositionManagerChildnum) - 1].transform.position;
-        BorderTile.transform.position = new Vector3(Main_Action.borderx, Main_Action.bordery, 0f);
+        if (!debugmode)
+        {
+            transform.position = main.RestartPosition[Mathf.Clamp(Main_Action.stage, 1, main.RestartPositionManagerChildnum) - 1].transform.position;
+            BorderTile.transform.position = new Vector3(Main_Action.borderx, Main_Action.bordery, 0f);
+        }
+        else
+        {
+            Main_Action.borderx = BorderTile.transform.position.x;
+            Main_Action.bordery = BorderTile.transform.position.y;
+        }
         GetComponent<BoxCollider2D>().enabled = true;
         RestartCurtainEnd();
         walktime = 0f;
@@ -122,7 +133,10 @@ public class Char_Action : MonoBehaviour
         {
             hangcount = hangtime;
             jumpcanceled = false;
-            anim.SetBool("isjumping", false);
+            if (rb.velocity.y < 1f)
+            {
+                anim.SetBool("isjumping", false);
+            }
         }
         else
         {
@@ -552,6 +566,7 @@ public class Char_Action : MonoBehaviour
                 Main_Action.stage += 1;
                 main.StageSetting();
             }
+
         }
         if (collision.gameObject.CompareTag("Danger") && state != -1)
         {
