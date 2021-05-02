@@ -38114,7 +38114,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   main: {fileID: 828492844}
-  debugmode: 1
+  debugmode: 0
   hangcount: 0
   hangtime: 0.08
   jumpbuffercount: 0
