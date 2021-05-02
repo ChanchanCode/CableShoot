@@ -1,0 +1,289 @@
+diff a/Assets/MoveBlock_Action.cs b/Assets/MoveBlock_Action.cs	(rejected hunks)
+@@ -27,150 +27,200 @@
+         istouched = false;
+     }
+ 
++    Vector3 Dir2Vec(string dir) {
++        switch (dir) {
++        case "up":
++            return Vector3.up;
++        case "down":
++            return Vector3.down;
++        case "left":
++            return Vector3.left;
++        case "right":
++            return Vector3.right;
++        default:
++            return Vector3.zero;
++        }
++    }
++
+     // Update is called once per frame
+     void Update()
+     {
+         powered = PA.powered;
+         sr.color = powered > 0 ? Main_Action.PowerCol : Color.white;
++        var targetPos = originpos + Dir2Vec(dir) * maxDist;
+         if (powered > 0)
+         {
+-            if (dir == "up")
++            if (maxDist < 0 || Vector3.Magnitude(transform.position - targetPos) > 0.01f)
+             {
+-                if (Physics2D.OverlapBox(new Vector2(transform.position.x, transform.position.y + offset + 0.04f), new Vector2(offset, 0.02f), 0f, playerlayer))
++                if (dir == "up")
+                 {
+-                    if (!Physics2D.OverlapBox(new Vector2(transform.position.x, transform.position.y + offset + 0.35f), new Vector2(offset, 0.02f), 0f, groundlayer))
++                    if (maxDist < 0 || transform.position.y < targetPos.y)
+                     {
+-                        rb.velocity = Vector2.up * 1f;
+-                    }
+-                    else
+-                    {
+-                        rb.velocity = Vector2.zero;
+-                    }
+-                }
+-                else
+-                {
+-                    Collider2D[] col = Physics2D.OverlapBoxAll(new Vector2(transform.position.x, transform.position.y + offset - 0.01f), new Vector2(offset, 0.000001f), 0f, groundlayer);
+-                    istouched = false;
+-                    foreach (Collider2D c in col)
++                        if (Physics2D.OverlapBox(new Vector2(transform.position.x, transform.position.y + offset + 0.04f), new Vector2(offset, 0.02f), 0f, playerlayer))
++                        {
++                            if (!Physics2D.OverlapBox(new Vector2(transform.position.x, transform.position.y + offset + 0.35f), new Vector2(offset, 0.02f), 0f, groundlayer))
++                            {
++                                rb.velocity = Vector2.up * 1f;
++                            }
++                            else
++                            {
++                                rb.velocity = Vector2.zero;
++                            }
++                        }
++                        else
+                     {
+-                        if (c.gameObject != gameObject && !c.gameObject.CompareTag("Box"))
++                        Collider2D[] col = Physics2D.OverlapBoxAll(new Vector2(transform.position.x, transform.position.y + offset - 0.01f), new Vector2(offset, 0.000001f), 0f, groundlayer);
++                        istouched = false;
++                        foreach (Collider2D c in col)
+                         {
+-                            istouched = true;
++                            if (c.gameObject != gameObject && !c.gameObject.CompareTag("Box"))
++                            {
++                                istouched = true;
++                            }
++                        }
++                        if (!istouched)
++                        {
++                            rb.velocity = Vector2.up * 1f;
++                        }
++                        else
++                        {
++                            rb.velocity = Vector2.zero;
+                         }
+                     }
+-                    if (!istouched)
+-                    {
+-                        rb.velocity = Vector2.up * 1f;
+                     }
+                     else
+                     {
++                        transform.position = targetPos;
+                         rb.velocity = Vector2.zero;
+                     }
+                 }
+-            }
+-            else if (dir == "down")
+-            {
+-                if (Physics2D.OverlapBox(new Vector2(transform.position.x, transform.position.y - offset - 0.04f), new Vector2(offset, 0.02f), 0f, playerlayer))
++                else if (dir == "down")
+                 {
+-                    if (!Physics2D.OverlapBox(new Vector2(transform.position.x, transform.position.y - offset - 0.35f), new Vector2(offset, 0.02f), 0f, groundlayer))
+-                    {
+-                        rb.velocity = Vector2.down * 1f;
+-                    }
+-                    else
++                    if (maxDist < 0 || transform.position.y > targetPos.y)
+                     {
+-                        rb.velocity = Vector2.zero;
+-                    }
+-                }
+-                else
+-                {
+-                    Collider2D[] col = Physics2D.OverlapBoxAll(new Vector2(transform.position.x, transform.position.y - offset + 0.01f), new Vector2(offset, 0.000001f), 0f, groundlayer);
+-                    istouched = false;
+-                    foreach (Collider2D c in col)
++                        if (Physics2D.OverlapBox(new Vector2(transform.position.x, transform.position.y - offset - 0.04f), new Vector2(offset, 0.02f), 0f, playerlayer))
++                        {
++                            if (!Physics2D.OverlapBox(new Vector2(transform.position.x, transform.position.y - offset - 0.35f), new Vector2(offset, 0.02f), 0f, groundlayer))
++                            {
++                                rb.velocity = Vector2.down * 1f;
++                            }
++                            else
++                            {
++                                rb.velocity = Vector2.zero;
++                            }
++                        }
++                        else
+                     {
+-                        if (c.gameObject != gameObject)
++                        Collider2D[] col = Physics2D.OverlapBoxAll(new Vector2(transform.position.x, transform.position.y - offset + 0.01f), new Vector2(offset, 0.000001f), 0f, groundlayer);
++                        istouched = false;
++                        foreach (Collider2D c in col)
+                         {
+-                            istouched = true;
++                            if (c.gameObject != gameObject)
++                            {
++                                istouched = true;
++                            }
++                        }
++                        if (!istouched)
++                        {
++                            rb.velocity = Vector2.down * 1f;
++                        }
++                        else
++                        {
++                            rb.velocity = Vector2.zero;
+                         }
+                     }
+-                    if (!istouched)
+-                    {
+-                        rb.velocity = Vector2.down * 1f;
+                     }
+                     else
+                     {
++                        transform.position = targetPos;
+                         rb.velocity = Vector2.zero;
+                     }
+                 }
+-            }
+-            else if (dir == "left")
+-            {
+-                if (Physics2D.OverlapBox(new Vector2(transform.position.x - offset - 0.04f, transform.position.y), new Vector2(0.02f, offset), 0f, playerlayer))
++                else if (dir == "left")
+                 {
+-                    if (!Physics2D.OverlapBox(new Vector2(transform.position.x - offset - 0.3208f, transform.position.y), new Vector2(0.02f, offset), 0f, groundlayer))
+-                    {
+-                        rb.velocity = Vector2.left * 1f;
+-                    }
+-                    else
++                    if (maxDist < 0 || transform.position.x > targetPos.x)
+                     {
+-                        rb.velocity = Vector2.zero;
+-                    }
+-                }
+-                else
+-                {
+-                    Collider2D[] col = Physics2D.OverlapBoxAll(new Vector2(transform.position.x - offset + 0.005f, transform.position.y), new Vector2(0.000001f, offset), 0f, groundlayer);
+-                    istouched = false;
+-                    foreach (Collider2D c in col)
++                        if (Physics2D.OverlapBox(new Vector2(transform.position.x - offset - 0.04f, transform.position.y), new Vector2(0.02f, offset), 0f, playerlayer))
++                        {
++                            if (!Physics2D.OverlapBox(new Vector2(transform.position.x - offset - 0.3208f, transform.position.y), new Vector2(0.02f, offset), 0f, groundlayer))
++                            {
++                                rb.velocity = Vector2.left * 1f;
++                            }
++                            else
++                            {
++                                rb.velocity = Vector2.zero;
++                            }
++                        }
++                        else
+                     {
+-                        if (c.gameObject != gameObject)
++                        Collider2D[] col = Physics2D.OverlapBoxAll(new Vector2(transform.position.x - offset + 0.005f, transform.position.y), new Vector2(0.000001f, offset), 0f, groundlayer);
++                        istouched = false;
++                        foreach (Collider2D c in col)
+                         {
+-                            istouched = true;
++                            if (c.gameObject != gameObject)
++                            {
++                                istouched = true;
++                            }
++                        }
++                        if (!istouched)
++                        {
++                            rb.velocity = Vector2.left * 1f;
++                        }
++                        else
++                        {
++                            rb.velocity = Vector2.zero;
+                         }
+                     }
+-                    if (!istouched)
+-                    {
+-                        rb.velocity = Vector2.left * 1f;
+                     }
+                     else
+                     {
++                        transform.position = targetPos;
+                         rb.velocity = Vector2.zero;
+                     }
+                 }
+-            }
+-            else if (dir == "right")
+-            {
+-                if (Physics2D.OverlapBox(new Vector2(transform.position.x + offset + 0.04f, transform.position.y), new Vector2(0.02f, offset), 0f, playerlayer))
++                else if (dir == "right")
+                 {
+-                    if (!Physics2D.OverlapBox(new Vector2(transform.position.x + offset + 0.3208f, transform.position.y), new Vector2(0.02f, offset), 0f, groundlayer))
+-                    {
+-                        rb.velocity = Vector2.right * 1f;
+-                    }
+-                    else
++                    if (maxDist < 0 || transform.position.x < targetPos.x)
+                     {
+-                        rb.velocity = Vector2.zero;
+-                    }
+-                }
+-                else
+-                {
+-                    Collider2D[] col = Physics2D.OverlapBoxAll(new Vector2(transform.position.x + offset - 0.005f, transform.position.y), new Vector2(0.000001f, offset), 0f, groundlayer);
+-                    istouched = false;
+-                    foreach (Collider2D c in col)
++                        if (Physics2D.OverlapBox(new Vector2(transform.position.x + offset + 0.04f, transform.position.y), new Vector2(0.02f, offset), 0f, playerlayer))
++                        {
++                            if (!Physics2D.OverlapBox(new Vector2(transform.position.x + offset + 0.3208f, transform.position.y), new Vector2(0.02f, offset), 0f, groundlayer))
++                            {
++                                rb.velocity = Vector2.right * 1f;
++                            }
++                            else
++                            {
++                                rb.velocity = Vector2.zero;
++                            }
++                        }
++                        else
+                     {
+-                        if (c.gameObject != gameObject)
++                        Collider2D[] col = Physics2D.OverlapBoxAll(new Vector2(transform.position.x + offset - 0.005f, transform.position.y), new Vector2(0.000001f, offset), 0f, groundlayer);
++                        istouched = false;
++                        foreach (Collider2D c in col)
+                         {
+-                            istouched = true;
++                            if (c.gameObject != gameObject)
++                            {
++                                istouched = true;
++                            }
++                        }
++                        if (!istouched)
++                        {
++                            rb.velocity = Vector2.right * 1f;
++                        }
++                        else
++                        {
++                            rb.velocity = Vector2.zero;
+                         }
+                     }
+-                    if (!istouched)
+-                    {
+-                        rb.velocity = Vector2.right * 1f;
+                     }
+                     else
+                     {
++                        transform.position = targetPos;
+                         rb.velocity = Vector2.zero;
+                     }
+                 }
+             }
+-
+         }
+         else
+         {

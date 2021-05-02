@@ -15,18 +15,18 @@ public class Button_Action : MonoBehaviour
     public LayerMask groundlayer;
     bool ispressed;
     bool previspressed;
-    int state;
     float dummynum;
     SpriteRenderer sr;
     GameObject box;
-
+    AudioSource aud;
+    public AudioClip Aud_Button;
     // Start is called before the first frame update
     void Start()
     {
         ispressed = false;
         previspressed = ispressed;
-        state = 1;
         sr = GetComponent<SpriteRenderer>();
+        aud = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -128,6 +128,10 @@ public class Button_Action : MonoBehaviour
                 {
                     g.GetComponent<PowerBlock_Action>().powered += a;
                 }
+            }
+            if (ispressed)
+            {
+                aud.PlayOneShot(Aud_Button, 0.2f);
             }
         }
 

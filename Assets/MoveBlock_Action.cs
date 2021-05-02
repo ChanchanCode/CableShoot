@@ -11,8 +11,6 @@ public class MoveBlock_Action : MonoBehaviour
     SpriteRenderer sr;
     Rigidbody2D rb;
     float offset = 0.25f;
-    float playerheight = 8f;
-    float playerwidth = 0.12f;
     public LayerMask playerlayer;
     public LayerMask groundlayer;
     Vector3 originpos;
@@ -27,18 +25,20 @@ public class MoveBlock_Action : MonoBehaviour
         istouched = false;
     }
 
-    Vector3 Dir2Vec(string dir) {
-        switch (dir) {
-        case "up":
-            return Vector3.up;
-        case "down":
-            return Vector3.down;
-        case "left":
-            return Vector3.left;
-        case "right":
-            return Vector3.right;
-        default:
-            return Vector3.zero;
+    Vector3 Dir2Vec(string dir)
+    {
+        switch (dir)
+        {
+            case "up":
+                return Vector3.up;
+            case "down":
+                return Vector3.down;
+            case "left":
+                return Vector3.left;
+            case "right":
+                return Vector3.right;
+            default:
+                return Vector3.zero;
         }
     }
 
@@ -68,25 +68,25 @@ public class MoveBlock_Action : MonoBehaviour
                             }
                         }
                         else
-                    {
-                        Collider2D[] col = Physics2D.OverlapBoxAll(new Vector2(transform.position.x, transform.position.y + offset - 0.01f), new Vector2(offset, 0.000001f), 0f, groundlayer);
-                        istouched = false;
-                        foreach (Collider2D c in col)
                         {
-                            if (c.gameObject != gameObject && !c.gameObject.CompareTag("Box"))
+                            Collider2D[] col = Physics2D.OverlapBoxAll(new Vector2(transform.position.x, transform.position.y + offset - 0.01f), new Vector2(offset, 0.000001f), 0f, groundlayer);
+                            istouched = false;
+                            foreach (Collider2D c in col)
                             {
-                                istouched = true;
+                                if (c.gameObject != gameObject && !c.gameObject.CompareTag("Box"))
+                                {
+                                    istouched = true;
+                                }
+                            }
+                            if (!istouched)
+                            {
+                                rb.velocity = Vector2.up * 1f;
+                            }
+                            else
+                            {
+                                rb.velocity = Vector2.zero;
                             }
                         }
-                        if (!istouched)
-                        {
-                            rb.velocity = Vector2.up * 1f;
-                        }
-                        else
-                        {
-                            rb.velocity = Vector2.zero;
-                        }
-                    }
                     }
                     else
                     {
@@ -110,25 +110,25 @@ public class MoveBlock_Action : MonoBehaviour
                             }
                         }
                         else
-                    {
-                        Collider2D[] col = Physics2D.OverlapBoxAll(new Vector2(transform.position.x, transform.position.y - offset + 0.01f), new Vector2(offset, 0.000001f), 0f, groundlayer);
-                        istouched = false;
-                        foreach (Collider2D c in col)
                         {
-                            if (c.gameObject != gameObject)
+                            Collider2D[] col = Physics2D.OverlapBoxAll(new Vector2(transform.position.x, transform.position.y - offset + 0.01f), new Vector2(offset, 0.000001f), 0f, groundlayer);
+                            istouched = false;
+                            foreach (Collider2D c in col)
                             {
-                                istouched = true;
+                                if (c.gameObject != gameObject)
+                                {
+                                    istouched = true;
+                                }
+                            }
+                            if (!istouched)
+                            {
+                                rb.velocity = Vector2.down * 1f;
+                            }
+                            else
+                            {
+                                rb.velocity = Vector2.zero;
                             }
                         }
-                        if (!istouched)
-                        {
-                            rb.velocity = Vector2.down * 1f;
-                        }
-                        else
-                        {
-                            rb.velocity = Vector2.zero;
-                        }
-                    }
                     }
                     else
                     {
@@ -152,25 +152,25 @@ public class MoveBlock_Action : MonoBehaviour
                             }
                         }
                         else
-                    {
-                        Collider2D[] col = Physics2D.OverlapBoxAll(new Vector2(transform.position.x - offset + 0.005f, transform.position.y), new Vector2(0.000001f, offset), 0f, groundlayer);
-                        istouched = false;
-                        foreach (Collider2D c in col)
                         {
-                            if (c.gameObject != gameObject)
+                            Collider2D[] col = Physics2D.OverlapBoxAll(new Vector2(transform.position.x - offset + 0.005f, transform.position.y), new Vector2(0.000001f, offset), 0f, groundlayer);
+                            istouched = false;
+                            foreach (Collider2D c in col)
                             {
-                                istouched = true;
+                                if (c.gameObject != gameObject)
+                                {
+                                    istouched = true;
+                                }
+                            }
+                            if (!istouched)
+                            {
+                                rb.velocity = Vector2.left * 1f;
+                            }
+                            else
+                            {
+                                rb.velocity = Vector2.zero;
                             }
                         }
-                        if (!istouched)
-                        {
-                            rb.velocity = Vector2.left * 1f;
-                        }
-                        else
-                        {
-                            rb.velocity = Vector2.zero;
-                        }
-                    }
                     }
                     else
                     {
@@ -194,25 +194,25 @@ public class MoveBlock_Action : MonoBehaviour
                             }
                         }
                         else
-                    {
-                        Collider2D[] col = Physics2D.OverlapBoxAll(new Vector2(transform.position.x + offset - 0.005f, transform.position.y), new Vector2(0.000001f, offset), 0f, groundlayer);
-                        istouched = false;
-                        foreach (Collider2D c in col)
                         {
-                            if (c.gameObject != gameObject)
+                            Collider2D[] col = Physics2D.OverlapBoxAll(new Vector2(transform.position.x + offset - 0.005f, transform.position.y), new Vector2(0.000001f, offset), 0f, groundlayer);
+                            istouched = false;
+                            foreach (Collider2D c in col)
                             {
-                                istouched = true;
+                                if (c.gameObject != gameObject)
+                                {
+                                    istouched = true;
+                                }
+                            }
+                            if (!istouched)
+                            {
+                                rb.velocity = Vector2.right * 1f;
+                            }
+                            else
+                            {
+                                rb.velocity = Vector2.zero;
                             }
                         }
-                        if (!istouched)
-                        {
-                            rb.velocity = Vector2.right * 1f;
-                        }
-                        else
-                        {
-                            rb.velocity = Vector2.zero;
-                        }
-                    }
                     }
                     else
                     {
@@ -221,10 +221,14 @@ public class MoveBlock_Action : MonoBehaviour
                     }
                 }
             }
+            else
+            {
+                rb.velocity = Vector2.zero;
+            }
         }
         else
         {
-            
+
             if (Vector3.Magnitude(transform.position - originpos) > 0.01f)
             {
                 if (dir == "up")
@@ -399,7 +403,7 @@ public class MoveBlock_Action : MonoBehaviour
                 rb.velocity = Vector2.zero;
             }
 
-            
+
         }
     }
 }

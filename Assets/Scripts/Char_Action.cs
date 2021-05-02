@@ -212,7 +212,7 @@ public class Char_Action : MonoBehaviour
                     {
                         PlugFail();
                         state = 0;
-                        aud.PlayOneShot(main.Aud_NotPluggedin, 0.2f);
+                        aud.PlayOneShot(main.Aud_NotPluggedin, 0.4f);
                         break;
                     }
                 }
@@ -221,7 +221,7 @@ public class Char_Action : MonoBehaviour
                     PlugFail();
                     rb.gravityScale = gravityscale;
                     state = 0;
-                    aud.PlayOneShot(main.Aud_NotPluggedin, 0.2f);
+                    aud.PlayOneShot(main.Aud_NotPluggedin, 0.4f);
                 }
                 
             }
@@ -254,7 +254,7 @@ public class Char_Action : MonoBehaviour
 
             if (Plug.transform.rotation == Quaternion.Euler(0f, 0f, 90f))
             {
-                if (Mathf.Abs(transform.position.x - PlugLinePos.position.x) > 0.05f)
+                if (Mathf.Abs(transform.position.x - PlugLinePos.position.x) > 0.1f)
                 {
                     Plug.SetActive(false);
                     PlugFail();
@@ -264,7 +264,7 @@ public class Char_Action : MonoBehaviour
             }
             else
             {
-                if (Mathf.Abs(transform.position.y - PlugLinePos.position.y) > 0.1f)
+                if (Mathf.Abs(transform.position.y - PlugLinePos.position.y) > 0.15f)
                 {
                     Plug.SetActive(false);
                     PlugFail();
@@ -363,7 +363,7 @@ public class Char_Action : MonoBehaviour
         if (walktime >= 0.4f)
         {
             walktime = 0f;
-            aud.PlayOneShot(main.Aud_Walk, 0.2f);
+            aud.PlayOneShot(main.Aud_Walk, 0.4f);
         }
         anim.SetFloat("xspeed", Mathf.Abs(rb.velocity.x) - (Moveblock != null && issticked ? Moveblock.GetComponent<Rigidbody2D>().velocity.x : 0));
         anim.SetFloat("yspeed", rb.velocity.y - (Moveblock != null && issticked ? Moveblock.GetComponent<Rigidbody2D>().velocity.y : 0));
@@ -371,7 +371,7 @@ public class Char_Action : MonoBehaviour
     }
     void Jump()
     {
-        aud.PlayOneShot(main.Aud_Jump, 0.2f);
+        aud.PlayOneShot(main.Aud_Jump, 0.4f);
         shoottime = 0;
         rb.velocity = new Vector2(rb.velocity.x, jumpspeed * (isboxpicked ? 0.6f : 1));
         hangcount = 0;
@@ -395,7 +395,7 @@ public class Char_Action : MonoBehaviour
                     Plug.GetComponent<Rigidbody2D>().velocity = new Vector2(0f, shootspeed);
                     Plug.transform.localScale = new Vector3(1, 1, 1);
                     Plug.transform.rotation = Quaternion.Euler(0f, 0f, 90f);
-                    aud.PlayOneShot(main.Aud_Shoot, 0.6f);
+                    aud.PlayOneShot(main.Aud_Shoot, 1f);
                 }
             }
             else if (state == 2 || state == 3)
@@ -420,7 +420,7 @@ public class Char_Action : MonoBehaviour
                     Plug.GetComponent<Rigidbody2D>().velocity = new Vector2(shootspeed * shootdir, 0f);
                     Plug.transform.localScale = new Vector3(shootdir, 1, 1);
                     Plug.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-                    aud.PlayOneShot(main.Aud_Shoot, 0.6f);
+                    aud.PlayOneShot(main.Aud_Shoot, 1f);
                 }
             }
             else if (state == 2 || state == 3)
@@ -576,7 +576,7 @@ public class Char_Action : MonoBehaviour
         }
         if (collision.gameObject.CompareTag("Danger") && state != -1)
         {
-            aud.PlayOneShot(main.Aud_Die, 0.3f);
+            aud.PlayOneShot(main.Aud_Die, 0.6f);
             CameraShaker.Instance.ShakeOnce(6f, 7f, 0.1f, 0.3f);
             CircleParticle.Play();
             state = -1;
