@@ -10,6 +10,10 @@ TagManager:
   - BorderLine
   - Danger
   - MovingBlock
+  - MapBorder
+  - Platform
+  - NPC
+  - Interact
   layers:
   - Default
   - TransparentFX
@@ -24,9 +28,9 @@ TagManager:
   - Player
   - Border
   - Danger
-  - 
-  - 
-  - 
+  - MapBorder
+  - NPC
+  - Interact
   - 
   - 
   - 
@@ -49,4 +53,7 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 3666139897
+    locked: 0
+  - name: UI
+    uniqueID: 2185255219
     locked: 0
