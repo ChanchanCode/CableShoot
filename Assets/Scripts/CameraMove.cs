@@ -46,9 +46,8 @@ public class CameraMove : MonoBehaviour
         }
         else
         {
-           
             transform.position = Vector3.Lerp(transform.position, new Vector3(viewx, viewy + 0.25f, -10f), 7f * Time.fixedDeltaTime);
-            CameraShaker.Instance.RestPositionOffset = transform.position;
+            CameraShaker.Instance.RestPositionOffset = new Vector3(viewx, viewy + 0.25f, -10f);
         }
     }
 }

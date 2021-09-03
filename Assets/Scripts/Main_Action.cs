@@ -13,8 +13,8 @@ public class Main_Action : MonoBehaviour
     public static int minute = 0;
     public static int hour = 0;
     public static string Entereddir = "left";
-    public int maxhp = 2;
-    public int hp = 1;
+    public static int maxhp = 4;
+    public static int hp = 4;
     int mainmaxhp;
     int mainhp;
 
@@ -24,6 +24,7 @@ public class Main_Action : MonoBehaviour
 
     public static GameObject Char;
     public static CutsceneManager CM;
+    public static Inventory_Action IA;
     public static float roommovedir;
     public static Vector4 viewborder;
     public static Vector2 camerasize;
@@ -48,6 +49,11 @@ public class Main_Action : MonoBehaviour
     public GameObject BatteryBlackPanel;
     public Transform BatteryTransform;
 
+
+
+    public static bool isInventoryOpened;
+
+
     public List<GameObject> Batteries;
     Vector2 BatteryOriginalPos = new Vector3(26.8f, 0f);
     float BatteryXoffset = 57.4f - 26.8f;
@@ -56,15 +62,20 @@ public class Main_Action : MonoBehaviour
     {
         Char = GameObject.Find("Char");
         CM = GameObject.Find("CutSceneManager").GetComponent<CutsceneManager>();
+        IA = GameObject.Find("InventoryManager").GetComponent<Inventory_Action>();
+
     }
     void Start()
     {
+        PowerCol = new Color(200 / 255f, 200 / 255f, 200 / 255f);
+
         viewborder = new Vector4(-6f, 6f, -3.75f, 3.75f);
         CM = GameObject.Find("CutSceneManager").GetComponent<CutsceneManager>();
         Char = GameObject.Find("Char");
         roommovedir = 0f;
         camerasize = new Vector2(12f, 7.5f) / 2;
         isroommove = false;
+        
         RestartPosition.Clear();
         stageinfostring.Clear();
         RestartPositionManagerChildnum = RestartPositionManager.transform.childCount;
@@ -73,14 +84,12 @@ public class Main_Action : MonoBehaviour
             RestartPosition.Add(RestartPositionManager.transform.GetChild(i).gameObject);
             stageinfostring.Add(RestartPosition[i].GetComponent<StageInfo>().info);
         }
-        //StageSetting();
-        PowerCol = new Color(200 / 255f, 200 / 255f, 200 / 255f);
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        //SettingUpdate();
         if (isplatformflipped)
         {
             flippingtime -= Time.deltaTime;
@@ -92,6 +101,8 @@ public class Main_Action : MonoBehaviour
             mainhp = hp;
             BatteryUpdate();
         }
+
+
     }
     public void PlatformDownJump()
     {
@@ -156,5 +167,7 @@ public class Main_Action : MonoBehaviour
         }
 
     }
+
+    
 }
   

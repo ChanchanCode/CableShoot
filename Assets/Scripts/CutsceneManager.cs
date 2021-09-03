@@ -33,11 +33,16 @@ public class CutsceneManager : MonoBehaviour
     {
         public Sprite smile;                    
     }
+    [System.Serializable]
+    public struct PropoStructure
+    {
+        public Sprite idle;
+    }
 
     public PadangStructure PadangSprite;
     public CharStructure CharSprite;
-
-
+    public PropoStructure PropoSprite;
+    //Powercol HexCode : <color=#c8c8c8ff> </color>
     // Start is called before the first frame update
     void Start()
     {
@@ -47,7 +52,6 @@ public class CutsceneManager : MonoBehaviour
         isyesselected = true;
         NextButtonPos = new Vector2(NextButtonTransform.anchoredPosition.x, NextButtonTransform.anchoredPosition.y);
         GenerateCutScene();
-
     }
 
     void GenerateCutScene()
@@ -108,6 +112,7 @@ public class CutsceneManager : MonoBehaviour
     }
     public IEnumerator Dialogue(string name, string sentence, Sprite sprite)
     {
+        bool highlighted = false;
         isskipmode = false;
         NextButtonTransform.gameObject.SetActive(false);
         YesNoDialoguePanelObject.SetActive(false);
@@ -115,19 +120,33 @@ public class CutsceneManager : MonoBehaviour
         DialogueText.text = "";
         DialogueImage.sprite = sprite;
         DialoguePanelObject.SetActive(true);
+        StopCoroutine("ShakePanel");
+        StartCoroutine(ShakePanel());
         foreach (char letter in sentence)
         {
-            DialogueText.text += letter;
+            if (letter == '*')
+            {
+                highlighted = !highlighted;
+            }
+            else
+            {
+                if (highlighted) DialogueText.text += "<color=#c8c8c8ff>" + letter + "</color>";
+                else DialogueText.text += letter;
+            }
             if (isskipmode)
             {
-                DialogueText.text = sentence;
+                DialogueText.text = StringHighlightExchange(sentence);
                 yield return StartCoroutine(WaitForKeyPress(true));
                 yield break;
             }
             else 
             {
-                if (letter == '\n') yield return new WaitForSeconds(0.2f);
-                else yield return new WaitForSeconds(0.05f);
+                if (letter == '*' || letter == ' ') continue;
+                else
+                {
+                    if (letter == '\n') yield return new WaitForSeconds(0.1f);
+                    else yield return new WaitForSeconds(0.05f);
+                }
             }
         }
         yield return new WaitForSeconds(0.1f);
@@ -152,6 +171,8 @@ public class CutsceneManager : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
                 {
                     isyesselected = !isyesselected;
+                    StopCoroutine("ShakeYesNoPanel");
+                    StartCoroutine(ShakeYesNoPanel());
                     if (isyesselected) YesNoText.text = "<color=white>네  /</color>  <color=#808080ff>아니요</color>";
                     else YesNoText.text = "<color=#808080ff>네  </color><color=white>/  아니요</color>";
                 }
@@ -168,18 +189,32 @@ public class CutsceneManager : MonoBehaviour
 
     public IEnumerator YesNoDialogue(string name, string sentence, Sprite sprite)
     {
+        bool highlighted = false;
         isskipmode = false;
         NextButtonTransform.gameObject.SetActive(false);
         DialogueNameText.text = name;
         DialogueText.text = "";
         DialogueImage.sprite = sprite;
         DialoguePanelObject.SetActive(true);
+        StopCoroutine("ShakePanel");
+        StartCoroutine(ShakePanel());
         foreach (char letter in sentence)
         {
-            DialogueText.text += letter;
+            if (letter == '*')
+            {
+                highlighted = !highlighted;
+            }
+            else
+            {
+                if (highlighted)
+                {
+                    DialogueText.text += "<color=#c8c8c8ff>" + letter + "</color>";
+                }
+                else DialogueText.text += letter;
+            }
             if (isskipmode)
             {
-                DialogueText.text = sentence;
+                DialogueText.text = StringHighlightExchange(sentence);
                 yield return StartCoroutine(WaitForKeyPress(false));
                 YesNoDialoguePanelObject.SetActive(true);
                 isyesselected = true;
@@ -188,8 +223,12 @@ public class CutsceneManager : MonoBehaviour
             }
             else
             {
-                if (letter == '\n') yield return new WaitForSeconds(0.1f);
-                else yield return new WaitForSeconds(0.05f);
+                if (letter == '*' || letter == ' ') continue;
+                else
+                {
+                    if (letter == '\n') yield return new WaitForSeconds(0.1f);
+                    else yield return new WaitForSeconds(0.05f);
+                }
             }
         }
         yield return new WaitForSeconds(0.2f);
@@ -199,29 +238,83 @@ public class CutsceneManager : MonoBehaviour
         yield return StartCoroutine(WaitForSelectYesNo());
         yield break;
     }
+    IEnumerator ShakePanel()
+    {
+        DialoguePanelObject.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+        float shaketime = 0.5f;
+        float zrot = 0f;
+        while (shaketime <= 5f)
+        {
+            zrot = 1f * (Mathf.Cos(shaketime * 3f) / (shaketime * shaketime));
+            DialoguePanelObject.transform.rotation = Quaternion.Euler(0f, 0f, zrot);
+            shaketime += 0.1f;
+            yield return null;
+        }
+        DialoguePanelObject.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+        yield break;
+    }
 
+    IEnumerator ShakeYesNoPanel()
+    {
+        YesNoDialoguePanelObject.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+        float shaketime = 0.5f;
+        float zrot = 0f;
+        while (shaketime <= 5f)
+        {
+            zrot = (isyesselected ? 1 : -1) * (Mathf.Cos(shaketime * 3f) / (shaketime * shaketime));
+            YesNoDialoguePanelObject.transform.rotation = Quaternion.Euler(0f, 0f, zrot);
+            shaketime += 0.1f;
+            yield return null;
+        }
+        YesNoDialoguePanelObject.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+        yield break;
+    }
     public void CutsceneStartSetting()
     {
         Main_Action.Char.GetComponent<Char_Action>().PlugFail();
         Main_Action.Char.GetComponent<Char_Action>().Plug.SetActive(false);
         Main_Action.Char.GetComponent<Char_Action>().state = State.Cutscene;
-        Debug.Log("시작");
     }
     public void CutsceneEndSetting()
     {
         Main_Action.Char.GetComponent<Char_Action>().state = State.Normal;
-        Debug.Log("끝");
     }
 
+    string StringHighlightExchange(string text)
+    {
+        string ret = null;
+        bool highlighted = false;
+        foreach(char s in text)
+        {
+            if (s == '*')
+            {
+                if (!highlighted)
+                {
+                    ret += "<color=#c8c8c8ff>";
+                    highlighted = true;
+                }
+                else
+                {
+                    ret += "</color>";
+                    highlighted = true;
+                }
+            }
+            else
+            {
+                ret += s;
+            }
+        }
+        return ret;
+    }
 
     public IEnumerator CutScene()
     {
         CutsceneStartSetting();
-        yield return Dialogue("파댕파댕", "ㅋㅋ안녕하세요~~~\n이번에 처음 들어온 신입이에요!!", PadangSprite.Subak);
-        yield return Dialogue("창범", "..!", CharSprite.smile);
-        yield return YesNoDialogue("파댕파댕", "혹시 밥 드실래요?", PadangSprite.Subak);
-        if (isyesselected) yield return Dialogue("파댕파댕", "같이 먹죠!", PadangSprite.BBISuung);
-        else yield return Dialogue("파댕파댕", "어이없네..\n먹지마세요", PadangSprite.BBISuung);
+        yield return Dialogue("프로포", "뭐야, 처음 보는 얼굴이네.", PropoSprite.idle);
+        yield return Dialogue("토깽이", "...", CharSprite.smile);
+        yield return YesNoDialogue("프로포", "할 일 없으면 가서 *식료품 상자*나 옮기지?", PropoSprite.idle);
+        if (isyesselected) yield return Dialogue("프로포", "다녀와.", PropoSprite.idle);
+        else yield return Dialogue("프로포", "..?", PropoSprite.idle);
         CutsceneEndSetting();
     }
 
@@ -230,7 +323,6 @@ public class CutsceneManager : MonoBehaviour
         if (interactnum >= 0 && interactnum < ARRAYSIZE && CutSceneArray[interactnum] != null)
         {
             StartCoroutine(CutSceneArray[interactnum]);
-            Debug.Log("zz");
         }
         else
         {
